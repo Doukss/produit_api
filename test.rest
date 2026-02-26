@@ -1,0 +1,59 @@
+POST http://localhost:3000/categories
+Content-Type: application/json
+
+{
+"libelle": "Electronique"
+}
+
+### lister les categories
+GET http://localhost:3000/categories
+
+
+
+### creer un produit
+POST http://localhost:3000/produits 
+Content-Type: application/json
+
+{
+  "nom": "Produit 1",
+  "prix": 19.99,
+  "description": "Description du produit 1",
+  "stock": 10,
+  "categorieId": 1
+}
+
+### creer un produit
+POST http://localhost:3000/produits 
+Content-Type: application/json
+
+{
+  "nom": "Produit 3",
+  "prix": 29.99,
+  "description": "Description du produit 2",
+  "stock": 5,
+  "categorieId": 1
+}
+
+### lister les produits
+GET http://localhost:3000/produits
+
+
+### supprimer un produit
+DELETE http://localhost:3000/produits/1
+
+### creer un fournisseur
+POST http://localhost:3000/fournisseurs 
+Content-Type: application/json
+
+{
+  "nom": "Fournisseur Global",
+  "email": "contact@global.com",
+  "telephone": "770000000",
+  "produitsIds": [1, 2]
+}
+
+### lister les fournisseurs
+GET http://localhost:3000/fournisseurs
+
+### swagger
+GET http://localhost:3000/api-docs
