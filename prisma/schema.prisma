@@ -15,13 +15,17 @@ model Categorie {
 }
 
 model Produit {
-  id           Int           @id @default(autoincrement())
-  nom          String
-  prix         Float
-  stock        Int
-  categorieId  Int
-  createdAt    DateTime      @default(now())
-  description  String?
+  id          Int      @id @default(autoincrement())
+  nom         String
+  prix        Float
+  stock       Int
+  categorieId Int
+  createdAt   DateTime @default(now())
+  description String?
+
+  imageUrl      String?
+  imagePublicId String?
+
   categorie    Categorie     @relation(fields: [categorieId], references: [id], onDelete: Cascade)
   fournisseurs Fournisseur[] @relation("FournisseurToProduit")
 }

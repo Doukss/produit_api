@@ -1,39 +1,69 @@
 import repo from "../repositories/produit.repo.js";
 import categorieRepo from "../repositories/categorie.repo.js";
 import { HttpError } from "../utils/httpError.js";
+import { v2 as cloudinary } from "cloudinary";
+
+// ✅ Fonction upload Cloudinary
+const uploadToCloudinary = (fileBuffer) =>
+  new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder: "produits" },
+      (error, result) => {
+        if (error) reject(error);
+        else resolve(result);
+      }
+    );
+    stream.end(fileBuffer);
+  });
 
 export default {
-  async create(data) {
+  async create(data, file) {
     const { nom, prix, stock, categorieId, description } = data;
+    const validePrix = parseFloat(prix);
+    const valideStock = parseInt(stock, 10);
+    const valideCategorieId = parseInt(categorieId, 10);
 
+    // 🔎 VALIDATIONS
     if (!nom || nom.trim().length < 2) {
       throw new HttpError(422, "VALIDATION_ERROR", "Nom invalide");
     }
 
-    if (typeof prix !== "number" || prix <= 0) {
+    if (isNaN(validePrix) || validePrix <= 0) {
       throw new HttpError(422, "VALIDATION_ERROR", "Prix invalide");
     }
 
-    if (!Number.isInteger(stock) || stock < 0) {
+    if (isNaN(valideStock) || valideStock < 0) {
       throw new HttpError(422, "VALIDATION_ERROR", "Stock invalide");
     }
 
-    if (!Number.isInteger(categorieId)) {
+    if (isNaN(valideCategorieId)) {
       throw new HttpError(422, "VALIDATION_ERROR", "categorieId invalide");
     }
 
-    const categorie = await categorieRepo.findById(categorieId);
+    const categorie = await categorieRepo.findById(valideCategorieId);
 
     if (!categorie) {
       throw new HttpError(404, "NOT_FOUND", "Categorie introuvable");
     }
 
+    // ☁️ Upload image si présent
+    let imageUrl = null;
+    let imagePublicId = null;
+
+    if (file) {
+      const result = await uploadToCloudinary(file.buffer);
+      imageUrl = result.secure_url;
+      imagePublicId = result.public_id;
+    }
+
     return repo.create({
       nom: nom.trim(),
       description,
-      prix,
-      stock,
-      categorieId,
+      prix: validePrix,
+      stock: valideStock,
+      categorieId: valideCategorieId,
+      imageUrl,
+      imagePublicId
     });
   },
 
@@ -51,21 +81,47 @@ export default {
     return produit;
   },
 
-  async update(id, data) {
+  async update(id, data, file) {
     const produit = await repo.findById(id);
 
     if (!produit) {
       throw new HttpError(404, "NOT_FOUND", "Produit introuvable");
     }
 
-    return repo.update(id, data);
+    let imageUrl = produit.imageUrl;
+    let imagePublicId = produit.imagePublicId;
+
+    // 🔁 Remplacement image si nouveau fichier
+    if (file) {
+      // supprimer ancienne image si existe
+      if (imagePublicId) {
+        await cloudinary.uploader.destroy(imagePublicId);
+      }
+
+      const result = await uploadToCloudinary(file.buffer);
+      imageUrl = result.secure_url;
+      imagePublicId = result.public_id;
+    }
+
+    return repo.update(id, {
+      ...data,
+      imageUrl,
+      imagePublicId
+    });
   },
 
   async remove(id) {
-    const ok = await repo.delete(id);
+    const produit = await repo.findById(id);
 
-    if (!ok) {
+    if (!produit) {
       throw new HttpError(404, "NOT_FOUND", "Produit introuvable");
     }
-  },
+
+    // 🗑 Supprimer image Cloudinary
+    if (produit.imagePublicId) {
+      await cloudinary.uploader.destroy(produit.imagePublicId);
+    }
+
+    await repo.delete(id);
+  }
 };

@@ -30,6 +30,7 @@ Content-Type: application/json
   "nom": "Produit 3",
   "prix": 29.99,
   "description": "Description du produit 2",
+  "imageUrl": "https://res.cloudinary.com/dz04x57xg/image/upload/v1700000000/produits/produit3.jpg",
   "stock": 5,
   "categorieId": 1
 }
@@ -57,3 +58,16 @@ GET http://localhost:3000/fournisseurs
 
 ### swagger
 GET http://localhost:3000/api-docs
+
+### creer un produit avec image
+POST http://localhost:3000/produits 
+Content-Type: multipart/form-data
+
+{
+  "nom": "Produit 4",
+  "prix": 39.99,
+  "description": "Description du produit 4",
+  "stock": 3,
+  "categorieId": 1,
+  "image": (binary file)
+}

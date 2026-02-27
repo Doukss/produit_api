@@ -5,7 +5,7 @@ export const createProduitSchema = Joi.object({
 
   description: Joi.string().max(500).allow(null, ""),
 
-  prix: Joi.number().positive().precision(2).required(),
+  prix: Joi.number().positive().required(),
 
   stock: Joi.number().integer().min(0).required(),
 

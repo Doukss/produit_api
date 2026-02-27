@@ -49,6 +49,12 @@ const options = {
             prix: { type: "number", example: 999.99 },
             stock: { type: "integer", example: 50 },
             categorieId: { type: "integer", example: 1 },
+            imageUrl: {
+              type: "string",
+              example:
+                "https://res.cloudinary.com/demo/image/upload/v1/produits/sample.jpg",
+            },
+            imagePublicId: { type: "string", example: "produits/sample" },
             categorie: { $ref: "#/components/schemas/Categorie" },
           },
         },
@@ -71,6 +77,36 @@ const options = {
             prix: { type: "number", positive: true, example: 999.99 },
             stock: { type: "integer", minimum: 0, example: 50 },
             categorieId: { type: "integer", positive: true, example: 1 },
+            image: {
+              type: "string",
+              format: "binary",
+              description: "Fichier image à uploader (JPEG, PNG, JPG)",
+            },
+          },
+        },
+        UpdateProduit: {
+          type: "object",
+          properties: {
+            nom: {
+              type: "string",
+              minLength: 2,
+              maxLength: 100,
+              example: "Ordinateur portable",
+            },
+            description: {
+              type: "string",
+              maxLength: 500,
+              example: "PC haut de gamme",
+              nullable: true,
+            },
+            prix: { type: "number", positive: true, example: 999.99 },
+            stock: { type: "integer", minimum: 0, example: 50 },
+            categorieId: { type: "integer", positive: true, example: 1 },
+            image: {
+              type: "string",
+              format: "binary",
+              description: "Fichier image à uploader (JPEG, PNG, JPG)",
+            },
           },
         },
         Fournisseur: {

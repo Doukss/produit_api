@@ -3,6 +3,7 @@ import {
   createProduit,
   getProduits,
   getProduit,
+  updateProduit,
   deleteProduit,
 } from "../controllers/produit.controller.js";
 import { validate } from "../middlewares/validate.js";
@@ -10,6 +11,8 @@ import {
   createProduitSchema,
   updateProduitSchema,
 } from "../validations/produit.schema.js";
+import { upload } from "../middlewares/upload.js";
+import { uploadToCloudinary } from "../utils/uploadcloudinary.js";
 
 /**
  * @swagger
@@ -20,9 +23,23 @@ import {
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
- *             $ref: '#/components/schemas/CreateProduit'
+ *             type: object
+ *             properties:
+ *               nom:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               prix:
+ *                 type: number
+ *               stock:
+ *                 type: integer
+ *               categorieId:
+ *                 type: integer
+ *               image:
+ *                 type: string
+ *                 format: binary
  *     responses:
  *       201:
  *         description: Produit créé avec succès
@@ -96,9 +113,28 @@ import {
 
 const router = Router();
 
-router.post("/", validate(createProduitSchema), createProduit);
+router.post("/", upload.single("image"), createProduit);
 router.get("/", getProduits);
 router.get("/:id", getProduit);
 router.delete("/:id", deleteProduit);
+
+// router.put("/:id", upload.single("image"), updateProduit);
+router.post("/upload", upload.single("image"), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "Aucun fichier envoyé" });
+    }
+
+    const result = await uploadToCloudinary(req.file.buffer);
+
+    res.status(200).json({
+      message: "Upload réussi",
+      imageUrl: result.secure_url,
+      public_id: result.public_id,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 export default router;
