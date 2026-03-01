@@ -23,7 +23,6 @@ export default {
     const valideStock = parseInt(stock, 10);
     const valideCategorieId = parseInt(categorieId, 10);
 
-    // 🔎 VALIDATIONS
     if (!nom || nom.trim().length < 2) {
       throw new HttpError(422, "VALIDATION_ERROR", "Nom invalide");
     }
@@ -46,7 +45,6 @@ export default {
       throw new HttpError(404, "NOT_FOUND", "Categorie introuvable");
     }
 
-    // ☁️ Upload image si présent
     let imageUrl = null;
     let imagePublicId = null;
 
@@ -91,9 +89,7 @@ export default {
     let imageUrl = produit.imageUrl;
     let imagePublicId = produit.imagePublicId;
 
-    // 🔁 Remplacement image si nouveau fichier
     if (file) {
-      // supprimer ancienne image si existe
       if (imagePublicId) {
         await cloudinary.uploader.destroy(imagePublicId);
       }
@@ -117,7 +113,6 @@ export default {
       throw new HttpError(404, "NOT_FOUND", "Produit introuvable");
     }
 
-    // 🗑 Supprimer image Cloudinary
     if (produit.imagePublicId) {
       await cloudinary.uploader.destroy(produit.imagePublicId);
     }
