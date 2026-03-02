@@ -118,7 +118,7 @@ router.get("/", getProduits);
 router.get("/:id", getProduit);
 router.delete("/:id", deleteProduit);
 
-// router.put("/:id", upload.single("image"), updateProduit);
+router.put("/:id", upload.single("image"), updateProduit);
 router.post("/upload", upload.single("image"), async (req, res) => {
   try {
     if (!req.file) {

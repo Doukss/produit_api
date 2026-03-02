@@ -3,7 +3,7 @@ import categorieRepo from "../repositories/categorie.repo.js";
 import { HttpError } from "../utils/httpError.js";
 import { v2 as cloudinary } from "cloudinary";
 
-// ✅ Fonction upload Cloudinary
+
 const uploadToCloudinary = (fileBuffer) =>
   new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(

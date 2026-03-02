@@ -10,16 +10,10 @@ import { specs } from "./config/swagger.js";
 const app = express();
 
 app.use(express.json());
-
-// Swagger UI
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
-
 app.use("/categories", categorieRoutes);
-
 app.use("/produits", produitRoutes);
-
 app.use("/fournisseurs", fournisseurRoutes);
-
 app.use(notFound);
 app.use(errorHandler);
 
